@@ -28,6 +28,10 @@ app.post('/upload', (req, res)=>{
     })
 });
 
+app.get('./uploads', (req, res) =>{
+    console.log(res);
+})
+
 app.listen(8000, ()=>{
     console.log('Server is Online')
 })

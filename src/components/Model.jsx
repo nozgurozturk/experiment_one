@@ -22,9 +22,9 @@ export default class Model extends Component {
       1000
     );
     // LIGHTS
-    let ambientLight = new THREE.AmbientLight(0x404040);
-    let pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(0, 40, 25);
+    let ambientLight = new THREE.AmbientLight(0x0);
+    let pointLight = new THREE.PointLight(0xffffff, 15, 100);
+    pointLight.position.set(0, 40, 60);
     pointLight.lookAt(0, 0, 0);
     let rectLight = new THREE.RectAreaLight(0xffffff, 5, 15, 20);
     rectLight.position.set(0, 0, 25);
@@ -38,7 +38,6 @@ export default class Model extends Component {
     this.camera = camera;
     this.renderer = renderer;
     camera.position.z = 9;
-    // this.start();
   };
   loadFrame = () => {
     const material = new THREE.MeshPhysicalMaterial({
@@ -64,11 +63,14 @@ export default class Model extends Component {
     const listener = new THREE.AudioListener();
     const audio = new THREE.Audio(listener);
     const audioLoader = new THREE.AudioLoader();
-    audioLoader.load(require(`../../server/uploads/${this.props.auidoName}`), buffer => {
+    let path = require(`../assets/sample.mp3`);
+    if (this.props.name) {
+      path = require(`../../server/uploads/${this.props.name}`);
+    }
+    audioLoader.load(path, buffer => {
       audio.setBuffer(buffer);
       audio.setLoop(false);
-      audio.setVolume(0.5);
-      audio.play();
+      audio.setVolume(0.8);
     });
     this.audio = audio;
     let analyser = new THREE.AudioAnalyser(audio, 4096);
@@ -82,9 +84,10 @@ export default class Model extends Component {
     for (let i = -column + 2; i < column - 2; i++) {
       for (let j = -row + 2; j < row - 2; j++) {
         let material = new THREE.MeshPhysicalMaterial({
-          color: 0xffffff,
-          metalness: 0.2,
-          roughness: 0.18
+          color: 0xa2a2a2,
+          metalness: 0.8,
+          roughness: 0.5,
+          reflectivity: 0.8
         });
         let cube = new THREE.Mesh(geometry, material);
         cube.position.set(i / 4, j / 4, 0);
@@ -122,17 +125,21 @@ export default class Model extends Component {
     let average = this.analyser.getAverageFrequency();
     let i = 0;
     this.group.children.forEach(cube => {
-      cube.position.z = data[i] * average * 0.0002;
-      if (data[i] < 0.008) {
-        cube.material.color.setHSL(1, 1, 1);
+      cube.position.z = data[i] * average * 0.0001;
+      if (this.props.polychrome) {
+        if (data[i] < 0.008) {
+          cube.material.color.setHSL(1, 1, 1);
+        } else {
+          cube.material.color.setHSL(
+            0.8 -
+              ((data[i] * average * 0.0008 * i) / this.group.children.length) *
+                0.2,
+            1,
+            0.5
+          );
+        }
       } else {
-        cube.material.color.setHSL(
-          0,
-          0,
-          1 -
-            ((data[i] * average * 0.0004 * i) / this.group.children.length) *
-              0.15
-        );
+        cube.material.color.setHSL(1, 0, 0.8);
       }
       i++;
     });
@@ -151,9 +158,11 @@ export default class Model extends Component {
     this.audioVisualizer();
     this.acousticPulse();
     this.curveObject.verticesNeedUpdate = true;
+    this.group.colorsNeedUpdate = true;
     this.frameId = requestAnimationFrame(this.animate);
     this.renderScene();
     this.scene.remove(this.curveObject);
+    
   };
   stop = () => {
     cancelAnimationFrame(this.frameId);
@@ -162,19 +171,40 @@ export default class Model extends Component {
     this.setupScene();
     this.loadFrame();
     this.acousticCubes();
-  }
-  handleStart = () => {
     this.audioAnalyser();
-    this.start();
+    
+  }
+  componentWillReceiveProps() {
+    this.handleStart();
+    this.handlePlay();
+  }
+
+  handleStart = () => {
+    switch (this.props.start) {
+      case true:
+        this.start();
+        break;
+      case false:
+        this.audio.stop();
+        this.rotateFrame();
+        break;
+      default:
+        break;
+    }
   };
-  handlePause = () => {
-    this.audio.pause();
-    this.rotateFrame();
+  handlePlay = () => {
+    switch (this.props.play) {
+      case true:
+        this.audio.play();
+        break;
+      case false:
+        this.audio.pause();
+        break;
+      default:
+        break;
+    }
   };
-  handleResume = () => {
-    this.audio.play();
-    this.rotateFrame();
-  };
+
   rotateFrame = () => {
     TweenMax.to(this.root.rotation, 1.2, { y: Math.PI + Math.PI / 2 });
     this.root.rotation.y = Math.PI / 2;
@@ -182,10 +212,6 @@ export default class Model extends Component {
   render() {
     return (
       <div>
-        <button onClick={this.handleStart}>Start</button>
-        <button onClick={this.handlePause}>Pasue</button>
-        <button onClick={this.handleResume}>Resume</button>
-        <canvas />
         <canvas />
       </div>
     );

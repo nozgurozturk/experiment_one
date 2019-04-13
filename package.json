@@ -9,6 +9,7 @@
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
+    "react-svgmt": "^1.1.7",
     "styled-components": "^4.2.0",
     "three": "^0.103.0"
   },

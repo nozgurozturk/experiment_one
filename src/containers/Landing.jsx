@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import Uploader from "../components/Uploader";
 
 const Wrapper = styled.div`
   margin: 5vw;
@@ -8,7 +9,7 @@ const Wrapper = styled.div`
 const Column = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top:2vh;
+  margin-top: 2vh;
 `;
 const Row = styled.div`
   display: flex;
@@ -18,7 +19,7 @@ const Number = styled.div`
   position: fixed;
   top: 0vh;
   right: 5vw;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 20vw;
   color: #2a2a2a;
 `;
@@ -28,9 +29,9 @@ const Bold = styled.h2`
   margin-bottom: 1vh;
   font-size: 12vh;
   font-weight: 700;
-  color: #2a2a2a;
+  color: ${props => props.color};
   text-align: left;
-  letter-spacing:1vh;
+  letter-spacing: 1vh;
 `;
 const RedLine = styled.div`
   position: absolute;
@@ -45,16 +46,18 @@ const Bordered = styled(Bold)`
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: ${props => props.border};
 `;
+const Click = styled(Link)`
+  text-decoration: none;
+`;
 const Button = styled.button`
   border: none;
-  margin-left:4vh;
-  font-size: 4vh;
-  font-weight: 900;
-  letter-spacing:0.5vh;
+  margin: 0 4vh 0 0;
+  font-size: 12vh;
+  font-weight: 700;
+  letter-spacing: 0.5vh;
   transition: 600ms;
   color: white;
   background-color: none;
-  border-radius: ${props => props.radius};
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #ff0000;
   &:hover {
@@ -64,42 +67,31 @@ const Button = styled.button`
   &:focus {
     outline: none;
     transition: 600ms;
-    font-weight: 900;
     -webkit-text-stroke-color: #2a2a2a;
     color: #2a2a2a;
   }
 `;
-export default class Landing extends Component {
-  render() {
+export default function Landing (){
     return (
       <div>
-      <Wrapper>
+        <Wrapper>
           <Column>
-            <Bold>WELCOME TO</Bold>
+            <Bold color={"#2a2a2a"}>WELCOME TO</Bold>
             <Bordered border={"#2a2a2a"}>EXPERIMENT</Bordered>
             <div>
               <RedLine />
               <Bordered border={"#2a2a2a"}>ONE</Bordered>
             </div>
-            <Bold>STRANGER</Bold>
             <Row>
-            <Bordered border={"#ff0000"}>
-                SELECT
-              </Bordered>
-              <Column>
-                
-                <Link to="/experiment">
-                  <Button>SAMPLE</Button>
-                </Link>
-                <Link to="/experiment">
-                  <Button>UPLOAD</Button>
-                </Link>
-              </Column>
+              <Click to="/experiment">
+                <Button border={"#ff0000"}>CLICK</Button>
+              </Click>
+              <Bold color={"#2a2a2a"}>TO ENTER</Bold>
             </Row>
           </Column>
-      </Wrapper>
+        </Wrapper>
         <Number>1</Number>
-        </div>
+      </div>
     );
   }
-}
+
