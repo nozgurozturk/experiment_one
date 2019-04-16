@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import Uploader from "../components/Uploader";
@@ -49,13 +49,13 @@ const Bordered = styled(Bold)`
 const Click = styled(Link)`
   text-decoration: none;
 `;
-const Button = styled.button`
+const Button = styled.h2`
   border: none;
   margin: 0 4vh 0 0;
-  font-size: 12vh;
-  font-weight: 700;
+  font-size: 4.2vh;
+  font-weight: 900;
   letter-spacing: 0.5vh;
-  transition: 600ms;
+  transition: 900ms;
   color: white;
   background-color: none;
   -webkit-text-stroke-width: 1px;
@@ -71,27 +71,30 @@ const Button = styled.button`
     color: #2a2a2a;
   }
 `;
-export default function Landing (){
-    return (
-      <div>
-        <Wrapper>
-          <Column>
-            <Bold color={"#2a2a2a"}>WELCOME TO</Bold>
-            <Bordered border={"#2a2a2a"}>EXPERIMENT</Bordered>
-            <div>
-              <RedLine />
-              <Bordered border={"#2a2a2a"}>ONE</Bordered>
-            </div>
-            <Row>
+export default function Landing() {
+  return (
+    <div>
+      <Wrapper>
+        <Column>
+          <Bold color={"#2a2a2a"}>WELCOME TO</Bold>
+          <Bordered border={"#2a2a2a"}>EXPERIMENT</Bordered>
+          <div>
+            <RedLine />
+            <Bordered border={"#2a2a2a"}>ONE</Bordered>
+          </div>
+          <Bold color={"#2a2a2a"}>CONTUNIE W/</Bold>
+          <Row>
+            <Column>
               <Click to="/experiment">
-                <Button border={"#ff0000"}>CLICK</Button>
+                <Button border={"#ff0000"}>SAMPLE</Button>
               </Click>
-              <Bold color={"#2a2a2a"}>TO ENTER</Bold>
-            </Row>
-          </Column>
-        </Wrapper>
-        <Number>1</Number>
-      </div>
-    );
-  }
-
+              <Uploader />
+            </Column>
+            <Bold color={"#2a2a2a"}>AUDIO</Bold>
+          </Row>
+        </Column>
+      </Wrapper>
+      <Number>1</Number>
+    </div>
+  );
+}

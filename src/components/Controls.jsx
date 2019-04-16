@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { SvgLoader } from "react-svgmt";
-import { TweenMax } from "gsap/all";
 import styled from "styled-components";
 
 import play from "../assets/icons/play.svg";
@@ -50,23 +49,24 @@ export default class Controls extends Component {
     super(props);
     this.state = {
       isStart: false,
-      isPoly: false,
-      isPlay: false
+      isPlay: false,
     };
   }
-  handleClickStart = b => {
+  handleClickStart = (e, b) => {
+    e.preventDefault();
     this.setState({ isStart: b, isPlay: b });
     this.props.onStart(b);
-    this.props.onPlaying(b);
+    this.props.onPlay(b);
   };
 
-  handleClickPlay = b => {
+  handleClickPlay = (e, b) => {
+    e.preventDefault();
     this.setState({ isPlay: b });
-    this.props.onPlaying(b);
+    this.props.onPlay(b);
   };
-  handleClickPoly = b => {
-    this.setState({ isPoly: !b });
-    this.props.onPolychrome(b);
+  handleClickPoly = (e, b) => {
+    e.preventDefault();
+    this.props.onPoly(b);
   };
   render() {
     return (
@@ -76,7 +76,7 @@ export default class Controls extends Component {
             width={8 + "vh"}
             hidden={true && this.state.isStart}
             disabled={this.state.isStart}
-            onClick={() => this.handleClickStart(true)}
+            onClick={(e) => this.handleClickStart(e,true)}
           >
             <SvgLoader path={play} />
           </Button>
@@ -84,14 +84,14 @@ export default class Controls extends Component {
             width={8 + "vh"}
             hidden={!this.state.isStart}
             disabled={this.state.isPlay || !this.state.isStart}
-            onClick={() => this.handleClickPlay(true)}
+            onClick={(e) => this.handleClickPlay(e,true)}
           >
             <SvgLoader path={play} />
           </Button>
           <Button
             width={8 + "vh"}
             disabled={!this.state.isPlay}
-            onClick={() => this.handleClickPlay(false)}
+            onClick={(e) => this.handleClickPlay(e,false)}
           >
             <SvgLoader path={pause} />
           </Button>
@@ -99,7 +99,7 @@ export default class Controls extends Component {
           <Button
             width={8 + "vh"}
             disabled={!this.state.isStart}
-            onClick={() => this.handleClickStart(false)}
+            onClick={(e) => this.handleClickStart(e,false)}
           >
             <SvgLoader path={stop} />
           </Button>
@@ -109,7 +109,7 @@ export default class Controls extends Component {
             disabled={!this.state.isStart}
             width={30 + "vh"}
             gradient={"linear-gradient(90deg, #000000, #a2a2a2 )"}
-            onClick={() => this.handleClickPoly(false)}
+            onClick={(e) => this.handleClickPoly(e,false)}
           >
             MONOCHROME
           </Button>
@@ -117,7 +117,7 @@ export default class Controls extends Component {
             disabled={!this.state.isStart}
             width={30 + "vh"}
             gradient={"linear-gradient(90deg, blue,  violet)"}
-            onClick={() => this.handleClickPoly(true)}
+            onClick={(e) => this.handleClickPoly(e,true)}
           >
             POLYCHROME
           </Button>

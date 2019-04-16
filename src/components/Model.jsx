@@ -1,8 +1,33 @@
 import React, { Component } from "react";
-import THREE from "../components/threejs";
 import { TweenMax } from "gsap/all";
+import { connect } from "react-redux";
+import styled from "styled-components";
 
-export default class Model extends Component {
+import THREE from "../components/threejs";
+import Controls from "../components/Controls";
+
+const Panel = styled.div`
+  position: fixed;
+  top: 10vh;
+  right: 5vw;
+  display: flex;
+  flex-direction: column;
+  z-index: 99;
+`;
+const AudioName = styled.h2`
+  padding:2vh;
+  font-size: 2vh;
+  letter-spacing: 0.4vh;
+  font-weight: 700;
+`;
+
+class Model extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      audio: null
+    };
+  }
   setupScene = () => {
     //RENDERER
     const renderer = new THREE.WebGLRenderer({
@@ -59,22 +84,28 @@ export default class Model extends Component {
       this.root = root;
     });
   };
-  audioAnalyser = () => {
+
+  audioListener = () => {
     const listener = new THREE.AudioListener();
-    const audio = new THREE.Audio(listener);
     const audioLoader = new THREE.AudioLoader();
-    let path = require(`../assets/sample.mp3`);
-    if (this.props.name) {
+    let path;
+    if (this.props.name !== "") {
       path = require(`../../server/uploads/${this.props.name}`);
+    } else {
+      path = require(`../assets/sample.mp3`);
     }
     audioLoader.load(path, buffer => {
-      audio.setBuffer(buffer);
-      audio.setLoop(false);
-      audio.setVolume(0.8);
+      this.audio.setBuffer(buffer);
+      this.audio.setLoop(false);
+      this.audio.setVolume(0.8);
     });
-    this.audio = audio;
+    this.listener = listener;
+  };
+  audioAnalyser = () => {
+    const audio = new THREE.Audio(this.listener);
     let analyser = new THREE.AudioAnalyser(audio, 4096);
     this.analyser = analyser;
+    this.audio = audio;
   };
   acousticCubes = () => {
     const geometry = new THREE.BoxBufferGeometry(0.25, 0.25, 5);
@@ -126,7 +157,7 @@ export default class Model extends Component {
     let i = 0;
     this.group.children.forEach(cube => {
       cube.position.z = data[i] * average * 0.0001;
-      if (this.props.polychrome) {
+      if (this.state.isPoly) {
         if (data[i] < 0.008) {
           cube.material.color.setHSL(1, 1, 1);
         } else {
@@ -162,7 +193,6 @@ export default class Model extends Component {
     this.frameId = requestAnimationFrame(this.animate);
     this.renderScene();
     this.scene.remove(this.curveObject);
-    
   };
   stop = () => {
     cancelAnimationFrame(this.frameId);
@@ -171,16 +201,15 @@ export default class Model extends Component {
     this.setupScene();
     this.loadFrame();
     this.acousticCubes();
+    this.audioListener();
     this.audioAnalyser();
-    
-  }
-  componentWillReceiveProps() {
-    this.handleStart();
-    this.handlePlay();
   }
 
-  handleStart = () => {
-    switch (this.props.start) {
+  componentDidUpdate() {
+    this.audioListener();
+  }
+  handleStart = b => {
+    switch (b) {
       case true:
         this.start();
         break;
@@ -192,8 +221,8 @@ export default class Model extends Component {
         break;
     }
   };
-  handlePlay = () => {
-    switch (this.props.play) {
+  handlePlay = b => {
+    switch (b) {
       case true:
         this.audio.play();
         break;
@@ -204,7 +233,9 @@ export default class Model extends Component {
         break;
     }
   };
-
+  handlePoly = b => {
+    this.setState({ isPoly: b });
+  };
   rotateFrame = () => {
     TweenMax.to(this.root.rotation, 1.2, { y: Math.PI + Math.PI / 2 });
     this.root.rotation.y = Math.PI / 2;
@@ -213,7 +244,22 @@ export default class Model extends Component {
     return (
       <div>
         <canvas />
+        <Panel>
+          <Controls
+            onPlay={this.handlePlay}
+            onStart={this.handleStart}
+            onPoly={this.handlePoly}
+          />
+          <AudioName>{this.props.name}</AudioName>
+        </Panel>
       </div>
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    name: state.name
+  };
+};
+
+export default connect(mapStateToProps)(Model);
